@@ -210,7 +210,7 @@ class KerasPilot():
         return hist
 
 
-class KerasRicar(KerasPilot):
+class KerasRicoai(KerasPilot):
     """
     Use ReLU activation.
     """
@@ -224,11 +224,11 @@ class KerasRicar(KerasPilot):
                  loss_weight_throttle=0.001,
                  is_categorical=True,
                  *args, **kwargs):
-        super(KerasRicar, self).__init__(*args, **kwargs)
+        super(KerasRicoai, self).__init__(*args, **kwargs)
         if model:
             self.model = model
         else:
-            self.model = ricar_cnn(dropout_1=dropout_1,
+            self.model = ricoai_cnn(dropout_1=dropout_1,
                                    dropout_2=dropout_2,
                                    optimizer=optimizer,
                                    learning_rate=learning_rate,
@@ -244,7 +244,7 @@ class KerasRicar(KerasPilot):
         return angle_unbinned, throttle[0][0]
 
 
-def ricar_cnn(dropout_1=0.1,
+def ricoai_cnn(dropout_1=0.1,
                         dropout_2=0.1,
                         optimizer='rmsprop',
                         learning_rate=1.0e-5,

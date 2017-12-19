@@ -17,7 +17,7 @@ from docopt import docopt
 from vehicle import Vehicle, Lambda
 from cameras import PiCamera
 from joystick import JoystickController
-from keras import KerasRicar
+from keras import KerasRicoai
 from actuators import PCA9685, PWMSteering, PWMThrottle
 from tub import TubHandler, Tub
 from utils import linear_bin
@@ -186,7 +186,7 @@ def train(cfg, tub_names, model_name):
         return record
 
     # Load the model
-    kl = KerasRicar(dropout_1=dropout_1,
+    kl = KerasRicoai(dropout_1=dropout_1,
                     dropout_2=dropout_2,
                     optimizer=optimizer,
                     learning_rate=lr,
