@@ -1,0 +1,5 @@
+env/
+pycharm/*
+__pycache__/*
+.idea/*
+
