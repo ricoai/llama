@@ -1,0 +1,3 @@
+[submodule "lane_detect"]
+	path = lane_detect
+	url = https://ricoai@github.com/ricoai/lane_detect
