@@ -6,3 +6,4 @@ numpy
 pillow
 requests
 matplotlib
+opencv-python
