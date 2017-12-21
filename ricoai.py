@@ -20,8 +20,11 @@ from shutil import rmtree
 import utils as utils
 
 
-class KerasPilot():
- 
+class KerasPilot:
+
+    def __init__(self):
+        self.model = None
+
     def load(self, model_path):
         self.model = keras.models.load_model(model_path)
         self.model.summary()
@@ -82,11 +85,11 @@ class KerasPilot():
                 shutil.copyfile('config.py', os.path.join(folder, 'config.py'))
 
         # checkpoint to save model after each epoch
-        save_best = keras.callbacks.ModelCheckpoint(saved_model_path, 
-                                                    monitor='val_loss', 
-                                                    verbose=1, 
-                                                    save_best_only=True, 
-                                                    mode='min')
+        save_best = keras.callbacks.ModelCheckpoint(saved_model_path,
+                                                     monitor='val_loss',
+                                                     verbose=1,
+                                                     save_best_only=True,
+                                                     mode='min')
 
         # At the very least, we need to train and save the model with checkpoints
         callbacks_list = [save_best]
@@ -95,10 +98,10 @@ class KerasPilot():
         if is_early_stop:
             print("Using Early Stop")
             early_stop = keras.callbacks.EarlyStopping(monitor='val_loss',
-                                                       min_delta=.0005,
-                                                       patience=early_stop_count,
-                                                       verbose=1,
-                                                       mode='auto')
+                                                        min_delta=.0005,
+                                                        patience=early_stop_count,
+                                                        verbose=1,
+                                                        mode='auto')
 
             callbacks_list.append(early_stop)
 
@@ -108,14 +111,14 @@ class KerasPilot():
         if is_tensorboard:
             print("Using Tensorboard at " + tb_path + '\nRun tensorboard --logdir=' + tb_path + ' to view the tensorboard.')
             tb_callback = keras.callbacks.TensorBoard(log_dir=tb_path,
-                                                      histogram_freq=0,      # Histogram frequency - Does NOT work, val_gen is a generator and not data
-                                                      write_grads=True,      # Write Histogram, histogram_freq must be greater than 0
-                                                      write_graph=True,      # Write graph to describe network
+                                                       histogram_freq=0,  # Histogram frequency - Does NOT work, val_gen is a generator and not data
+                                                      write_grads=True,  # Write Histogram, histogram_freq must be greater than 0
+                                                      write_graph=True,  # Write graph to describe network
                                                       write_images=True,
-                                                      embeddings_freq=1,
-                                                      embeddings_layer_names=['dense_1', 'dense_2', 'dense_3'],
-                                                      batch_size=5
-                                                      )
+                                                       embeddings_freq=1,
+                                                       embeddings_layer_names=['dense_1', 'dense_2', 'dense_3'],
+                                                       batch_size=5
+                                                       )
             callbacks_list.append(tb_callback)
 
         if is_lr_decay:
@@ -229,13 +232,13 @@ class KerasRicoai(KerasPilot):
             self.model = model
         else:
             self.model = ricoai_cnn(dropout_1=dropout_1,
-                                   dropout_2=dropout_2,
-                                   optimizer=optimizer,
-                                   learning_rate=learning_rate,
-                                   loss_weight_angle=loss_weight_angle,
-                                   loss_weight_throttle=loss_weight_throttle,
-                                   is_categorical=is_categorical)
-        
+                                    dropout_2=dropout_2,
+                                    optimizer=optimizer,
+                                    learning_rate=learning_rate,
+                                    loss_weight_angle=loss_weight_angle,
+                                    loss_weight_throttle=loss_weight_throttle,
+                                    is_categorical=is_categorical)
+
     def run(self, img_arr):
         img_arr = img_arr.reshape((1,) + img_arr.shape)
         angle_binned, throttle = self.model.predict(img_arr)
@@ -245,16 +248,15 @@ class KerasRicoai(KerasPilot):
 
 
 def ricoai_cnn(dropout_1=0.1,
-                        dropout_2=0.1,
-                        optimizer='rmsprop',
-                        learning_rate=1.0e-5,
-                        loss_weight_angle=0.9,
-                        loss_weight_throttle=0.001,
-                        is_categorical=True):
-    from keras.layers import Input, Dense, merge
+               dropout_2=0.1,
+               optimizer='rmsprop',
+               learning_rate=1.0e-5,
+               loss_weight_angle=0.9,
+               loss_weight_throttle=0.001,
+               is_categorical=True):
+
     from keras.models import Model
-    from keras.layers import Convolution2D, MaxPooling2D, Reshape, BatchNormalization
-    from keras.layers import Activation, Dropout, Flatten, Dense
+    from keras.layers import Dropout, Flatten, Dense, Input, Convolution2D
     from keras.optimizers import Adam
 
     def image_normm(val):
@@ -283,9 +285,9 @@ def ricoai_cnn(dropout_1=0.1,
     else:
         angle_out = Dense(1, activation='linear', name='angle_out')(x)
 
-    # continous output of throttle
+    # continuous output of throttle
     throttle_out = Dense(1, activation='relu', name='throttle_out')(x)      # Reduce to 1 number, Positive number only
-    
+
     model = Model(inputs=[img_in], outputs=[angle_out, throttle_out])
 
     if optimizer == 'adam':

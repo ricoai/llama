@@ -2,4 +2,5 @@ env/
 pycharm/*
 __pycache__/*
 .idea/*
+.DS_Store
 

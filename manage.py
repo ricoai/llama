@@ -17,7 +17,7 @@ from docopt import docopt
 from vehicle import Vehicle, Lambda
 from cameras import PiCamera
 from joystick import JoystickController
-from keras import KerasRicoai
+from ricoai import KerasRicoai
 from actuators import PCA9685, PWMSteering, PWMThrottle
 from tub import TubHandler, Tub
 from utils import linear_bin
@@ -63,7 +63,7 @@ def drive(cfg, model_path=None, use_joystick=True):
     V.add(pilot_condition_part, inputs=['user/mode'], outputs=['run_pilot'])
 
     # Load the model configuration
-    kl = KerasRicar()
+    kl = KerasRicoai()
 
     if model_path:
         print(model_path)
@@ -192,8 +192,7 @@ def train(cfg, tub_names, model_name):
                     learning_rate=lr,
                     loss_weight_angle=loss_weight_angle,
                     loss_weight_throttle=loss_weight_throttle,
-                    is_categorical=is_categorical,
-                    is_lr_decay=is_lr_decay)
+                    is_categorical=is_categorical)
 
     tubs = gather_tubs(cfg, tub_names)
 
@@ -223,7 +222,8 @@ def train(cfg, tub_names, model_name):
              is_early_stop=is_stop_early,
              early_stop_count=early_stop_count,
              is_tensorboard=is_tensorboard,
-             is_plot_results=is_plot)
+             is_plot_results=is_plot,
+             is_lr_decay=is_lr_decay)
 
 
 def calibrate():
