@@ -1,6 +1,11 @@
 # Llama Car
 
-![Llama Car](https://github.com/ricoai/llama/raw/master/llama-logo.png "Llama Car Logo")
+<div align="center">
+<br>
+<img width="200" src="https://github.com/ricoai/llama/raw/master/llama-logo.png" alt="Llama Car Logo" />
+<br>
+</div>
+
 
 Llama car is derivative of [DonkeyCar](www.donkeycar.com)
 This is a Autonomous RC Car powered by a Raspberry Pi 3 and uses Tensorflow to create an autonomous car that uses neural networks to navigate a race course.
