@@ -7,3 +7,4 @@ pillow
 requests
 matplotlib
 Adafruit_PCA9685
+opencv-python

@@ -19,7 +19,9 @@ In general this project will teach you to use Neural Networks with Tensorflow an
 * ```cd llama```
 * ```virtualenv env --python python3```
 * ```source env/bin/activate```
+* ```sudo apt install python-opencv```
 * ```pip install -r requirements_desktop.txt```
+
 
 
 
