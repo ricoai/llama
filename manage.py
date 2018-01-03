@@ -17,7 +17,8 @@ from docopt import docopt
 from vehicle import Vehicle, Lambda
 from cameras import PiCamera
 from joystick import JoystickController
-from ricoai import KerasRicoai
+from keras import keras
+#from ricoai import KerasRicoai
 from actuators import PCA9685, PWMSteering, PWMThrottle
 from tub import TubHandler, Tub
 from utils import linear_bin
@@ -50,7 +51,7 @@ def drive(cfg, model_path=None, use_joystick=True):
           inputs=['cam/image_array'],
           outputs=['user/angle', 'user/throttle', 'user/mode', 'recording'],
           threaded=True)
-    
+
     # See if we should even run the pilot module.
     # This is only needed because the part run_contion only accepts boolean
     def pilot_condition(mode):
@@ -58,7 +59,7 @@ def drive(cfg, model_path=None, use_joystick=True):
             return False
         else:
             return True
-        
+
     pilot_condition_part = Lambda(pilot_condition)
     V.add(pilot_condition_part, inputs=['user/mode'], outputs=['run_pilot'])
 
@@ -68,28 +69,29 @@ def drive(cfg, model_path=None, use_joystick=True):
     if model_path:
         print(model_path)
         kl.load(model_path)
-    
-    V.add(kl, inputs=['cam/image_array'], 
+
+    V.add(kl,
+          inputs=['cam/image_array'],
           outputs=['pilot/angle', 'pilot/throttle'],
           run_condition='run_pilot')
 
     # Choose what inputs should change the car.
-    def drive_mode(mode, 
+    def drive_mode(mode,
                    user_angle, user_throttle,
                    pilot_angle, pilot_throttle):
         if mode == 'user':
             return user_angle, user_throttle
-        
+
         elif mode == 'local_angle':
             return pilot_angle, user_throttle
-        
-        else: 
+
+        else:
             return pilot_angle, pilot_throttle
-        
+
     drive_mode_part = Lambda(drive_mode)
-    V.add(drive_mode_part, 
+    V.add(drive_mode_part,
           inputs=['user/mode', 'user/angle', 'user/throttle',
-                  'pilot/angle', 'pilot/throttle'], 
+                  'pilot/angle', 'pilot/throttle'],
           outputs=['angle', 'throttle'])
 
     # Configure the throttle and angle control hardware
@@ -97,16 +99,19 @@ def drive(cfg, model_path=None, use_joystick=True):
     # Calibrate min/max/zero for throttle
     steering_controller = PCA9685(1)
     steering = PWMSteering(controller=steering_controller,
-                                    left_pulse=460, right_pulse=260,
-                                    invert_steering_angle=cfg.INVERT_STEERING_ANGLE)
-    
+                           left_pulse=460,
+                           right_pulse=260,
+                           invert_steering_angle=cfg.INVERT_STEERING_ANGLE)
+
     throttle_controller = PCA9685(0)
     throttle = PWMThrottle(controller=throttle_controller,
-                                    max_pulse=500, zero_pulse=370, min_pulse=220)
-    
+                           max_pulse=500,
+                           zero_pulse=370,
+                           min_pulse=220)
+
     V.add(steering, inputs=['angle'])
     V.add(throttle, inputs=['throttle'])
-    
+
     # Add tub to save data
     inputs = ['cam/image_array',
               'user/angle', 'user/throttle',
@@ -116,22 +121,23 @@ def drive(cfg, model_path=None, use_joystick=True):
              'float', 'float',
              'float', 'float',
              'str']
-    
+
     th = TubHandler(path=cfg.DATA_PATH)
     tub_writer = th.new_tub_writer(inputs=inputs, types=types)
     V.add(tub_writer, inputs=inputs, run_condition='recording')
-    
+
     # Run the vehicle for 20 seconds
     V.start(rate_hz=cfg.FPS, max_loop_count=100000)
-    
+
     print("You can now go to <your pi ip address>:8887 to drive your car.")
 
 
 def expand_path_masks(paths):
-    '''
+    """
     take a list of paths and expand any wildcards
     returns a new list of paths fully expanded
-    '''
+    """
+
     import glob
     expanded_paths = []
     for path in paths:
@@ -187,12 +193,12 @@ def train(cfg, tub_names, model_name):
 
     # Load the model
     kl = KerasRicoai(dropout_1=dropout_1,
-                    dropout_2=dropout_2,
-                    optimizer=optimizer,
-                    learning_rate=lr,
-                    loss_weight_angle=loss_weight_angle,
-                    loss_weight_throttle=loss_weight_throttle,
-                    is_categorical=is_categorical)
+                            dropout_2=dropout_2,
+                            optimizer=optimizer,
+                            learning_rate=lr,
+                            loss_weight_angle=loss_weight_angle,
+                            loss_weight_throttle=loss_weight_throttle,
+                            is_categorical=is_categorical)
 
     tubs = gather_tubs(cfg, tub_names)
 
@@ -229,17 +235,17 @@ def train(cfg, tub_names, model_name):
 def calibrate():
     channel = int(input('Enter the channel your actuator uses (0-15).'))
     c = PCA9685(channel)
-    
+
     for i in range(10):
         pmw = int(input('Enter a PWM setting to test(100-600)'))
         c.run(pmw)
 
 
 def check(cfg, tub_names, fix=True):
-    '''
+    """
     Check for any problems. Looks at tubs and find problems in any records or images that won't open.
     If fix is True, then delete images and records that cause problems.
-    '''
+    """
     tubs = gather_tubs(cfg, tub_names)
 
     for tub in tubs:
@@ -247,9 +253,9 @@ def check(cfg, tub_names, fix=True):
 
 
 def anaylze(cfg, tub_names, op, record):
-    '''
+    """
     look at the tub data and produce some analysis
-    '''
+    """
     tubs = gather_tubs(cfg, tub_names)
 
     if op == 'histogram':

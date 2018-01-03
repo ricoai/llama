@@ -1,5 +1,5 @@
 """
-pilots.py
+ricoai.py
 
 Methods to create, use, save and load pilots. Pilots 
 contain the highlevel logic used to determine the angle
@@ -12,12 +12,11 @@ import shutil
 import numpy as np
 import keras
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from datetime import datetime
 from shutil import rmtree
-
 import utils as utils
+matplotlib.use('Agg')
 
 
 class KerasPilot:
@@ -86,10 +85,10 @@ class KerasPilot:
 
         # checkpoint to save model after each epoch
         save_best = keras.callbacks.ModelCheckpoint(saved_model_path,
-                                                     monitor='val_loss',
-                                                     verbose=1,
-                                                     save_best_only=True,
-                                                     mode='min')
+                                                    monitor='val_loss',
+                                                    verbose=1,
+                                                    save_best_only=True,
+                                                    mode='min')
 
         # At the very least, we need to train and save the model with checkpoints
         callbacks_list = [save_best]
@@ -98,10 +97,10 @@ class KerasPilot:
         if is_early_stop:
             print("Using Early Stop")
             early_stop = keras.callbacks.EarlyStopping(monitor='val_loss',
-                                                        min_delta=.0005,
-                                                        patience=early_stop_count,
-                                                        verbose=1,
-                                                        mode='auto')
+                                                       min_delta=.0005,
+                                                       patience=early_stop_count,
+                                                       verbose=1,
+                                                       mode='auto')
 
             callbacks_list.append(early_stop)
 
@@ -111,14 +110,13 @@ class KerasPilot:
         if is_tensorboard:
             print("Using Tensorboard at " + tb_path + '\nRun tensorboard --logdir=' + tb_path + ' to view the tensorboard.')
             tb_callback = keras.callbacks.TensorBoard(log_dir=tb_path,
-                                                       histogram_freq=0,  # Histogram frequency - Does NOT work, val_gen is a generator and not data
+                                                      histogram_freq=0,  # Histogram frequency - Does NOT work, val_gen is a generator and not data
                                                       write_grads=True,  # Write Histogram, histogram_freq must be greater than 0
                                                       write_graph=True,  # Write graph to describe network
                                                       write_images=True,
-                                                       embeddings_freq=1,
-                                                       embeddings_layer_names=['dense_1', 'dense_2', 'dense_3'],
-                                                       batch_size=5
-                                                       )
+                                                      embeddings_freq=1,
+                                                      embeddings_layer_names=['dense_1', 'dense_2', 'dense_3'],
+                                                      batch_size=5)
             callbacks_list.append(tb_callback)
 
         if is_lr_decay:
@@ -128,19 +126,17 @@ class KerasPilot:
                     keras.set_value(self.model.optimizer.lr, lr * .9)
                     print("lr changed to {}".format(lr * .9))
                 return keras.get_value(self.model.optimizer.lr)
-
             lr_decay = keras.callbacks.LearningRateScheduler(scheduler)
             callbacks_list.append(lr_decay)
 
         # Start to train the model
-        hist = self.model.fit_generator(
-                        train_gen, 
-                        steps_per_epoch=steps, 
-                        epochs=epochs, 
-                        verbose=1, 
-                        validation_data=val_gen,
-                        callbacks=callbacks_list, 
-                        validation_steps=steps*(1.0 - train_split))
+        hist = self.model.fit_generator(train_gen,
+                                        steps_per_epoch=steps,
+                                        epochs=epochs,
+                                        verbose=1,
+                                        validation_data=val_gen,
+                                        callbacks=callbacks_list,
+                                        validation_steps=steps*(1.0 - train_split))
 
         if is_plot_results:
             # Save config
