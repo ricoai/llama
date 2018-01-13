@@ -4,4 +4,7 @@ __pycache__/*
 .idea/*
 .DS_Store
 car/__pycache/*
-
+models/
+models/*
+plots/
+plots/*

@@ -51,9 +51,12 @@ class KerasPilot:
         :param saved_model_path: Path to save the model
         :param epochs: Number of times to train on the data.
         :param steps: How many steps per epoch.
+        :param train_split How to split up the training data.
         :param is_early_stop: Stop early if the training does not improve.
+        :param early_stop_count: Number of unchanged iterations before stopping.
         :param is_tensorboard: Generate a tensorboard to monitor progress of the neural network.
         :param is_plot_results: Display matplotlib plots.  Same plots as tensorboard
+        :param is_lr_decay: Use Learning rate decay.
         """
 
         if is_plot_results or is_tensorboard:
