@@ -7,16 +7,15 @@ and throttle of a vehicle. Pilots can include one or more
 models to help direct the vehicles motion.
 """
 
+import matplotlib
 import os
 import shutil
-import numpy as np
 import keras
-import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from datetime import datetime
 from shutil import rmtree
-import utils as utils
-matplotlib.use('Agg')
+import car.utils as llama_utils
 
 
 class KerasPilot:
@@ -239,7 +238,7 @@ class KerasRicoai(KerasPilot):
         img_arr = img_arr.reshape((1,) + img_arr.shape)
         angle_binned, throttle = self.model.predict(img_arr)
         #angle_certainty = max(angle_binned[0])
-        angle_unbinned = utils.linear_unbin(angle_binned)
+        angle_unbinned = llama_utils.linear_unbin(angle_binned)
         return angle_unbinned, throttle[0][0]
 
 

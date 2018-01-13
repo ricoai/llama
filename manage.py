@@ -14,15 +14,14 @@ Usage:
 
 import os
 from docopt import docopt
-from vehicle import Vehicle, Lambda
-from cameras import PiCamera
-from joystick import JoystickController
-from keras import keras
-#from ricoai import KerasRicoai
-from actuators import PCA9685, PWMSteering, PWMThrottle
-from tub import TubHandler, Tub
-from utils import linear_bin
+
+from car.actuators import PCA9685, PWMSteering, PWMThrottle
+from car.cameras import PiCamera
+from car.joystick import JoystickController
+from car.utils import linear_bin
+from car.vehicle import Vehicle, Lambda
 from config import load_config
+from tub import TubHandler, Tub
 
 
 def drive(cfg, model_path=None, use_joystick=True):
@@ -35,6 +34,8 @@ def drive(cfg, model_path=None, use_joystick=True):
     :param model_path: Path to load the model.
     :param use_joystick Use parameter in startup to use joystick.
     """
+    from car.keras import KerasRicoai
+
     #Initialized car
     V = Vehicle()
 
@@ -169,6 +170,8 @@ def train(cfg, tub_names, model_name):
     :param tub_names: Tubs to load.  This must be the full path.
     :param model_name: Name of the model to create.
     """
+    from car.keras import KerasRicoai
+
     # Get the configuration
     is_tensorboard = cfg.IS_TENSORBOARD
     is_plot = cfg.IS_PLOT_RESULTS
@@ -193,12 +196,12 @@ def train(cfg, tub_names, model_name):
 
     # Load the model
     kl = KerasRicoai(dropout_1=dropout_1,
-                            dropout_2=dropout_2,
-                            optimizer=optimizer,
-                            learning_rate=lr,
-                            loss_weight_angle=loss_weight_angle,
-                            loss_weight_throttle=loss_weight_throttle,
-                            is_categorical=is_categorical)
+                     dropout_2=dropout_2,
+                     optimizer=optimizer,
+                     learning_rate=lr,
+                     loss_weight_angle=loss_weight_angle,
+                     loss_weight_throttle=loss_weight_throttle,
+                     is_categorical=is_categorical)
 
     tubs = gather_tubs(cfg, tub_names)
 
