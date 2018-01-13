@@ -3,5 +3,5 @@ pycharm/*
 __pycache__/*
 .idea/*
 .DS_Store
-
+car/__pycache/*
 
